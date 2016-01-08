@@ -1,0 +1,8 @@
+dspace:
+  url: https://seadtest.ideals.illinois.edu/
+  email:
+  password:
+
+sead:
+  c3pr_base_url: https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api
+  repository_id: ideals
