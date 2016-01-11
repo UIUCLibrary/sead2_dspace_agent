@@ -13,7 +13,7 @@ module Sead2DspaceAgent
     end
 
     def get_new_researchojects
-      response = RestClient.get(@ro_list_url, cookies: {'JSESSIONID' => 'D0F6EEE797C04CE9C968EF9E4FEC3CA2'})
+      response = RestClient.get(@ro_list_url, cookies: {'JSESSIONID' => 'C619F064CE7ED01B58131030304D9566'})
       ro_list = JSON.parse response
 
       ro_list.select{ |ro|
@@ -21,7 +21,7 @@ module Sead2DspaceAgent
       }.map { |ro|
         agg_id = CGI.escape(ro['Aggregation']['Identifier'])
         ro_url = "#{@ro_base_url}/#{agg_id}"
-        RestClient.get(ro_url, cookies: {'JSESSIONID' => 'D0F6EEE797C04CE9C968EF9E4FEC3CA2'})
+        RestClient.get(ro_url, cookies: {'JSESSIONID' => 'C619F064CE7ED01B58131030304D9566'})
       }.map { |ro|
         attrs = JSON.parse ro
         ore_url = attrs['Aggregation']['@id']
