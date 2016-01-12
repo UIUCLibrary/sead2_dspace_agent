@@ -13,7 +13,7 @@ module Sead2DspaceAgent
     end
 
     def get_new_researchojects
-      response = RestClient.get(@ro_list_url, cookies: {'JSESSIONID' => 'C619F064CE7ED01B58131030304D9566'})
+      response = RestClient.get(@ro_list_url, cookies: {'JSESSIONID' => '934A416FED3FDB1173076746DD635B0E'})
       ro_list = JSON.parse response
 
       ro_list.select{ |ro|
@@ -21,11 +21,11 @@ module Sead2DspaceAgent
       }.map { |ro|
         agg_id = CGI.escape(ro['Aggregation']['Identifier'])
         ro_url = "#{@ro_base_url}/#{agg_id}"
-        RestClient.get(ro_url, cookies: {'JSESSIONID' => 'C619F064CE7ED01B58131030304D9566'})
+        RestClient.get(ro_url, cookies: {'JSESSIONID' => '934A416FED3FDB1173076746DD635B0E'})
       }.map { |ro|
         attrs = JSON.parse ro
         ore_url = attrs['Aggregation']['@id']
-        ore_url = "https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api/researchobjects/urn%3Auuid%3A56901ddee4b073da5f137e8c/oremap#aggregation"
+        ore_url = "https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api/researchobjects/urn:uuid:56941cc9e4b073da5f13c989/oremap#aggregation"
         ResearchObject.new ore_url
       }
 

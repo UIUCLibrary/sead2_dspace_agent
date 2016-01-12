@@ -8,7 +8,7 @@ module Sead2DspaceAgent
 
     def initialize(url)
 
-      response = RestClient.get(url, cookies: {'JSESSIONID' => 'C619F064CE7ED01B58131030304D9566'})
+      response = RestClient.get(url, cookies: {'JSESSIONID' => '934A416FED3FDB1173076746DD635B0E'})
       ore = JSON.parse response
 
       @metadata = {}

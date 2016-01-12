@@ -1,4 +1,5 @@
 require 'rest-client'
+require 'open-uri'
 
 module Sead2DspaceAgent
 
@@ -30,7 +31,7 @@ module Sead2DspaceAgent
                   {key: 'dc.date', value: ro_metadata[:date], language: 'en'},
                   {key: 'dc.title', value: ro_metadata[:title], language: 'en'},
                   {key: 'dc.description.abstract', value: ro_metadata[:abstract], language: 'en'},
-                  {key: 'dc.creator', value: ro_metadata[:creator], language: 'en'},
+                  {key: 'dc.creator', value: ro_metadata[:creator][0].split(':')[0], language: 'en'},
                   {key: 'dc.rights', value: ro_metadata[:rights], language: 'en'}]
 
       response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,
@@ -39,17 +40,18 @@ module Sead2DspaceAgent
 
     def update_item_bitstream(aggregated_resource)
       bitstream = Tempfile.new(aggregated_resource.title)
+      name = CGI.escape aggregated_resource.title
       begin
-        open(aggregated_resource.file_url, 'rb') do |read_file|
+        open(aggregated_resource.file_url) do |read_file|
           bitstream.write(read_file.read)
         end
 
-        response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{bitstream.basename.gsub(' ', '_')}",
+        response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}",
                                    {transfer: {type: 'bitstream'}, upload: {file: bitstream}},
                                    {content_type: 'application/json', accept: 'application/json', rest_dspace_token: @login_token})
       ensure
-        file.close
-        file.unlink # deletes the temp file
+        bitstream.close
+        bitstream.unlink # deletes the temp file
       end
 
     end
