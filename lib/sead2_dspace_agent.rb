@@ -14,18 +14,35 @@ module Sead2DspaceAgent
   sead_connection = SeadConnection.new(@config['sead'])
   researchobjects = sead_connection.get_new_researchojects
 
-
   dspace_connection = DspaceConnection.new(@config['dspace'])
 
   researchobjects.each do |ro|
 
-    dspace_connection.create_item(COLL_ID)
-    dspace_connection.update_item_metadata(ro.metadata)
+    sead_connection.update_status('Pending', 'Processing research object', ro)
 
-    ro.aggregated_resources.each do |ar|
-      dspace_connection.update_item_bitstream(ar)
+    begin
+      ro.dspace_id, ro.dspace_handle = dspace_connection.create_item(COLL_ID)
+    rescue => e
+      sead_connection.update_status('Failure', "Error creating DSpace item: #{e.message}", ro)
     end
 
+    begin
+      dspace_connection.update_item_metadata(ro.metadata)
+    rescue => e
+      sead_connection.update_status('Failure', "Error updating DSpace item metadata: #{e.message}", ro)
+    end
+
+    ro.aggregated_resources.each do |ar|
+
+      begin
+        dspace_connection.update_item_bitstream(ar)
+      rescue => e
+        sead_connection.update_status('Failure', "Error submitting #{ar.title}: #{e.message}", ro)
+      end
+
+    end
+
+    sead_connection.update_status('Success', 'Processing research object', ro)
 
   end
 

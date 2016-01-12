@@ -22,8 +22,7 @@ module Sead2DspaceAgent
                                  {content_type: 'application/json', accept: 'application/json', rest_dspace_token: @login_token})
 
       item        = JSON.parse(response)
-      @itemid     = "#{item["id"]}"
-      @itemhandle = "#{item["handle"]}"
+      return item['id'], item['handle']
     end
 
     def update_item_metadata(ro_metadata)

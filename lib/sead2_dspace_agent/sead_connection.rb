@@ -7,8 +7,8 @@ module Sead2DspaceAgent
 
     def initialize(args = {})
       c3pr_base_url         = args['c3pr_base_url']
-      repository_id = args['repository_id']
-      @ro_list_url = "#{c3pr_base_url}/repositories/#{repository_id}/researchobjects"
+      @repository_id = args['repository_id']
+      @ro_list_url = "#{c3pr_base_url}/repositories/#{@repository_id}/researchobjects"
       @ro_base_url = "#{c3pr_base_url}/researchobjects"
     end
 
@@ -29,6 +29,12 @@ module Sead2DspaceAgent
         ResearchObject.new ore_url
       }
 
+    end
+
+    def update_status(stage, message, research_object)
+      RestClient.post("#{research_object.url}/status",
+                      {reporter: @repository_id, stage: stage, message: message}.to_json,
+                      {content_type: :json, accept: :json})
     end
 
   end
