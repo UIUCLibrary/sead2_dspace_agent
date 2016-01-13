@@ -11,6 +11,7 @@ module Sead2DspaceAgent
       @dspace_id     = nil
       @dspace_handle = nil
 
+      @ore_url = ore['id']
       @status_url = ore['@id'].gsub('oremap', 'status')
 
       @metadata            = {}

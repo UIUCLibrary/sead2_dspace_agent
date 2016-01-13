@@ -37,11 +37,11 @@ module Sead2DspaceAgent
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
-    def update_item_bitstream(aggregated_resource)
-      bitstream = Tempfile.new(aggregated_resource.title)
-      name = CGI.escape aggregated_resource.title
+    def update_item_bitstream(filename, url)
+      bitstream = Tempfile.new(filename)
+      name = CGI.escape filename
       begin
-        open(aggregated_resource.file_url) do |read_file|
+        open(url) do |read_file|
           bitstream.write(read_file.read)
         end
 
