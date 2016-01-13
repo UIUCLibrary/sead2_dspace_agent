@@ -1,8 +1,13 @@
 dspace:
   url: https://seadtest.ideals.illinois.edu/
+  collection_id: 116
   email:
   password:
 
 sead:
-  c3pr_base_url: https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api
+  c3pr_base_url: https://seadva-test.d2i.indiana.edu/sead-c3pr/api
   repository_id: ideals
+  use_proxy: true
+  proxy_base_url: https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api
+  proxy_cookies:
+    JSESSIONID: B6F88D0A9F9CA514C696B55B7BBA9360

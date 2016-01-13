@@ -6,12 +6,12 @@ module Sead2DspaceAgent
   class DspaceConnection
 
     def initialize(args = {})
-      @url         = args['url']
-      email        = args['email']
-      password     = args['password']
+      @url         = Sead2DspaceAgent::CONFIG['dspace']['url']
+      email        = Sead2DspaceAgent::CONFIG['dspace']['email']
+      password     = Sead2DspaceAgent::CONFIG['dspace']['password']
       @login_token = RestClient.post("#{@url}/rest/login",
                                      {email: email, password: password}.to_json,
-                                     {content_type: 'application/json', accept: 'application/json'})
+                                     {content_type: :json, accept: :json})
 
 
     end
@@ -19,7 +19,7 @@ module Sead2DspaceAgent
     def create_item(collection_id)
       response = RestClient.post("#{@url}/rest/collections/#{collection_id}/items",
                                  {type: 'item'}.to_json,
-                                 {content_type: 'application/json', accept: 'application/json', rest_dspace_token: @login_token})
+                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
 
       item        = JSON.parse(response)
       return item['id'], item['handle']
@@ -34,7 +34,7 @@ module Sead2DspaceAgent
                   {key: 'dc.rights', value: ro_metadata[:rights], language: 'en'}]
 
       response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,
-                                {content_type: 'application/json', accept: 'application/json', rest_dspace_token: @login_token})
+                                {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
     def update_item_bitstream(aggregated_resource)
@@ -47,7 +47,7 @@ module Sead2DspaceAgent
 
         response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}",
                                    {transfer: {type: 'bitstream'}, upload: {file: bitstream}},
-                                   {content_type: 'application/json', accept: 'application/json', rest_dspace_token: @login_token})
+                                   {content_type: :json, accept: :json, rest_dspace_token: @login_token})
       ensure
         bitstream.close
         bitstream.unlink # deletes the temp file
