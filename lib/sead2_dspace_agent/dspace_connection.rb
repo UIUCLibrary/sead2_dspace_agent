@@ -13,7 +13,7 @@ module Sead2DspaceAgent
                                      {email: email, password: password}.to_json,
                                      {content_type: :json, accept: :json})
 
-
+      @itemid, @handle = nil
     end
 
     def create_item(collection_id)
@@ -22,7 +22,8 @@ module Sead2DspaceAgent
                                  {content_type: :json, accept: :json, rest_dspace_token: @login_token})
 
       item        = JSON.parse(response)
-      return item['id'], item['handle']
+      @itemid, @handle =  item['id'], item['handle']
+      return @itemid, @handle
     end
 
     def update_item_metadata(ro_metadata)

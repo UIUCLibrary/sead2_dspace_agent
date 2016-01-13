@@ -4,14 +4,14 @@ module Sead2DspaceAgent
 
   class ResearchObject
 
-    attr_accessor :aggregated_resources, :metadata, :status_url, :dspace_handle, :dspace_id
+    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id
 
     def initialize(ore)
 
       @dspace_id     = nil
       @dspace_handle = nil
 
-      @ore_url = ore['id']
+      @ore_url = ore['@id']
       @status_url = ore['@id'].gsub('oremap', 'status')
 
       @metadata            = {}

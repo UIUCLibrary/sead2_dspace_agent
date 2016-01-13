@@ -63,6 +63,7 @@ module Sead2DspaceAgent
     rescue => e
       sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)
       logger.error "Failed to upload ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
+      next # give up and go to the next ro
     end
 
     # Process ARs
