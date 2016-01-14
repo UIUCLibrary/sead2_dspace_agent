@@ -22,7 +22,10 @@ module Sead2DspaceAgent
                                  {content_type: :json, accept: :json, rest_dspace_token: @login_token})
 
       item             = JSON.parse(response)
-      @itemid, @handle = item['id'], item['handle']
+
+      @itemid = item['id']
+      @handle = "http://hdl.handle.net/#{item['handle']}"
+      
       return @itemid, @handle
     end
 
