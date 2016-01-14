@@ -43,7 +43,7 @@ module Sead2DspaceAgent
     def update_status(stage, message, research_object)
       RestClient.post(proxy_url(research_object.status_url),
                       {reporter: @repository_id, stage: stage, message: message}.to_json,
-                      {cookies: @cookies, content_type: :json, accept: :json})
+                      {cookies: @cookies, content_type: :json, accept: :json}) if Sead2DspaceAgent::CONFIG['env'] == 'production'
     end
 
   end
