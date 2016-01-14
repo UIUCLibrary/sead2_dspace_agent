@@ -43,6 +43,7 @@ module Sead2DspaceAgent
     rescue => e
       sead_connection.update_status('Failure', "Error creating DSpace item: #{e.message}", ro)
       logger.error "Failed to create DSpace item #{ro.dspace_id} created at #{ro.dspace_handle}: #{e.message}"
+      dspace_connection.delete_item
       next # give up and go to the next ro
     end
 
@@ -53,6 +54,7 @@ module Sead2DspaceAgent
     rescue => e
       sead_connection.update_status('Failure', "Error updating DSpace item metadata: #{e.message}", ro)
       logger.error "Failed to update metadata for DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
+      dspace_connection.delete_item
       next # give up and go to the next ro
     end
 
@@ -63,11 +65,13 @@ module Sead2DspaceAgent
     rescue => e
       sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)
       logger.error "Failed to upload ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
+      dspace_connection.delete_item
       next # give up and go to the next ro
     end
 
     # Process ARs
     logger.info "Processing #{ro.aggregated_resources.length} aggregated resources for research object: #{ro.metadata[:id]}"
+    errors = false
     ro.aggregated_resources.each do |ar|
       logger.info "Processing aggregated resource: #{ar.title}"
 
@@ -78,8 +82,15 @@ module Sead2DspaceAgent
       rescue => e
         sead_connection.update_status('Failure', "Error submitting #{ar.title}: #{e.message}", ro)
         logger.error "Failed to upload #{ar.title} to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
+        errors = true
+        next # give up and go to the next ro
       end
 
+    end
+    if errors
+      logger.error "Failed to upload one or more ARs to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}. Giving up."
+      dspace_connection.delete_item
+      next
     end
 
     # Update status

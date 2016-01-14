@@ -21,9 +21,16 @@ module Sead2DspaceAgent
                                  {type: 'item'}.to_json,
                                  {content_type: :json, accept: :json, rest_dspace_token: @login_token})
 
-      item        = JSON.parse(response)
-      @itemid, @handle =  item['id'], item['handle']
+      item             = JSON.parse(response)
+      @itemid, @handle = item['id'], item['handle']
       return @itemid, @handle
+    end
+
+
+    def delete_item
+      response = RestClient.delete("#{@url}/rest/items/#{@itemid}",
+                                   {content_type: :json, accept: :json, rest_dspace_token: @login_token})
+
     end
 
     def update_item_metadata(ro_metadata)
@@ -40,14 +47,13 @@ module Sead2DspaceAgent
 
     def update_item_bitstream(filename, url)
       bitstream = Tempfile.new(filename)
-      name = CGI.escape filename
+      name      = CGI.escape filename
       begin
         open(url) do |read_file|
           bitstream.write(read_file.read)
         end
 
-        response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}",
-                                   {transfer: {type: 'bitstream'}, upload: {file: bitstream}},
+        response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}", bitstream,
                                    {content_type: :json, accept: :json, rest_dspace_token: @login_token})
       ensure
         bitstream.close
