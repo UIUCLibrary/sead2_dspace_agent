@@ -1,5 +1,5 @@
 require 'rest-client'
-require 'open-uri'
+require 'net/http'
 
 module Sead2DspaceAgent
 
@@ -45,16 +45,32 @@ module Sead2DspaceAgent
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
-    def update_item_bitstream(filename, url)
+    def update_item_bitstream(filename, url, cookies = {})
       bitstream = Tempfile.new(filename)
       name      = CGI.escape filename
+
+      uri = URI(url)
+      content_type = "text/plain"
+
       begin
-        open(url) do |read_file|
-          bitstream.write(read_file.read)
+        Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri
+          cookies.each { |k, v|
+            request['Cookie'] = CGI::Cookie.new(k, v).to_s
+          }
+
+          http.request request do |response|
+            content_type = response['content-type']
+            open bitstream, 'w' do |io|
+              response.read_body do |chunk|
+                io.write chunk
+              end
+            end
+          end
         end
 
         response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}", bitstream,
-                                   {content_type: :json, accept: :json, rest_dspace_token: @login_token})
+                                   {content_type: content_type, accept: :json, rest_dspace_token: @login_token})
       ensure
         bitstream.close
         bitstream.unlink # deletes the temp file

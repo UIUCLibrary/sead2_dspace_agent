@@ -4,6 +4,8 @@ module Sead2DspaceAgent
 
   class SeadConnection
 
+    attr_reader :use_proxy, :cookies
+
     def initialize(args = {})
       @c3pr_base_url = Sead2DspaceAgent::CONFIG['sead']['c3pr_base_url']
       @repository_id = Sead2DspaceAgent::CONFIG['sead']['repository_id']

@@ -60,7 +60,7 @@ module Sead2DspaceAgent
 
     # Deposit ORE ReM as a DSpace bitstream
     begin
-      dspace_connection.update_item_bitstream('ore.json', ro.ore_url)
+      dspace_connection.update_item_bitstream('ore.json', sead_connection.proxy_url(ro.ore_url), sead_connection.cookies)
       logger.info "Uploaded ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
     rescue => e
       sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)
