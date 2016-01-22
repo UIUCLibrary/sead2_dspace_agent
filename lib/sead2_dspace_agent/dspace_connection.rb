@@ -37,11 +37,13 @@ module Sead2DspaceAgent
     end
 
     def update_item_metadata(ro_metadata)
-      metadata = [{key: 'dc.identifier', value: ro_metadata[:id], language: 'en'},
-                  {key: 'dc.date', value: ro_metadata[:date], language: 'en'},
-                  {key: 'dc.title', value: ro_metadata[:title], language: 'en'},
+      metadata = [{key: 'dc.title', value: ro_metadata[:title], language: 'en'},
+                  {key: 'dc.title.alternative', value: ro_metadata[:alt_title], language: 'en'},
+                  {key: 'dc.creator', value: ro_metadata[:creator], language: 'en'},
                   {key: 'dc.description.abstract', value: ro_metadata[:abstract], language: 'en'},
-                  {key: 'dc.creator', value: ro_metadata[:creator][0].split(':')[0], language: 'en'},
+                  {key: 'dc.description', value: ro_metadata[:description], language: 'en'},
+                  {key: 'dc.subject', value: ro_metadata[:subject], language: 'en'},
+                  {key: 'dc.date', value: ro_metadata[:date], language: 'en'},
                   {key: 'dc.rights', value: ro_metadata[:rights], language: 'en'}]
 
       response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,

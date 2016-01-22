@@ -14,13 +14,28 @@ module Sead2DspaceAgent
       @ore_url = ore['@id']
       @status_url = ore['@id'].gsub('oremap', 'status')
 
-      @metadata            = {}
-      @metadata[:id]       = ore["describes"]["@id"]
-      @metadata[:title]    = ore["describes"]["Title"]
-      @metadata[:abstract] = ore["describes"]["Abstract"]
-      @metadata[:rights]   = ore["Rights"]
-      @metadata[:creator]  = ore["describes"]["Creator"]
-      @metadata[:date]     = ore["describes"]["Creation Date"]
+      key_elements = %w[dc.title dc.title.alternative dc.description dc.description.abstract dc.creator dc.subject dc.date dc.rights]
+
+      @metadata             = {}
+      @metadata[:id]        = ore["describes"]["@id"]    # Don't add this id in metadata
+      @metadata[:title]     = ore["describes"]["Title"]
+      @metadata[:alt_title] = ore["describes"]["Alternative Title"]
+      @metadata[:abstract]  = ore["describes"]["Abstract"]
+      @metadata[:rights]    = ore["Rights"]
+      @metadata[:creator]   = ore["describes"]["Creator"]
+      @metadata[:date]      = ore["describes"]["Creation Date"]
+      # @metadata[:has_part]  = ore["describes"]["Has Part"]  # Only includes the agg resources' id
+      @metadata[:subject]   = ore["describes"]["Keyword"]
+
+      other_info = []
+      other_info << fund = ore["describes"]["Funding Institution"]
+      other_info << time = ore["describes"]["Time Periods"]
+      other_info << aud  = ore["describes"]["Audience"]
+      other_info << pi   = ore["describes"]["Principal Investigator(s)"]
+
+      @metadata[:description] = other_info.map { |i| "'" + i.to_s + "'" }.join(",")
+
+
 
       ars                   = ore["describes"]["aggregates"]
       @aggregated_resources = ars.map { |ar| AggregatedResource.new ar }
