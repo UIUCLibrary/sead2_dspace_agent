@@ -42,7 +42,7 @@ module Sead2DspaceAgent
                   {key: 'dc.creator', value: ro_metadata[:creator], language: 'en'},
                   {key: 'dc.description.abstract', value: ro_metadata[:abstract], language: 'en'},
                   {key: 'dc.description', value: ro_metadata[:description], language: 'en'},
-                  {key: 'dc.subject', value: ro_metadata[:subject], language: 'en'},
+                  {key: 'dc.subject', value: ro_metadata[:subject][0], language: 'en'},
                   {key: 'dc.date', value: ro_metadata[:date], language: 'en'},
                   {key: 'dc.rights', value: ro_metadata[:rights], language: 'en'}]
 

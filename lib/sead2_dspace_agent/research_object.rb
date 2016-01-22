@@ -27,13 +27,12 @@ module Sead2DspaceAgent
       # @metadata[:has_part]  = ore["describes"]["Has Part"]  # Only includes the agg resources' id
       @metadata[:subject]   = ore["describes"]["Keyword"]
 
-      other_info = []
-      other_info << fund = ore["describes"]["Funding Institution"]
-      other_info << time = ore["describes"]["Time Periods"]
-      other_info << aud  = ore["describes"]["Audience"]
-      other_info << pi   = ore["describes"]["Principal Investigator(s)"]
-
-      @metadata[:description] = other_info.map { |i| "'" + i.to_s + "'" }.join(",")
+      other_info                          = {}
+      other_info["Funding Institution"]   = ore["describes"]["Funding Institution"]
+      other_info["Time Period"]           = ore["describes"]["Time Periods"]
+      other_info["Audience"]              = ore["describes"]["Audience"]
+      other_info["Project Investigators"] = ore["describes"]["Principal Investigator(s)"]
+      @metadata[:description]             = other_info.map{|k,v| "#{k} = #{v}"}.join('; ')
 
 
 
