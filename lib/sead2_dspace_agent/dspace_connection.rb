@@ -37,14 +37,14 @@ module Sead2DspaceAgent
     end
 
     def update_item_metadata(ro_metadata)
-      metadata = [{key: 'dc.title', value: ro_metadata[:title], language: 'en'},
-                  {key: 'dc.title.alternative', value: ro_metadata[:alt_title], language: 'en'},
-                  {key: 'dc.creator', value: ro_metadata[:creator], language: 'en'},
-                  {key: 'dc.description.abstract', value: ro_metadata[:abstract], language: 'en'},
-                  {key: 'dc.description', value: ro_metadata[:description], language: 'en'},
-                  {key: 'dc.subject', value: ro_metadata[:subject][0], language: 'en'},
-                  {key: 'dc.date', value: ro_metadata[:date], language: 'en'},
-                  {key: 'dc.rights', value: ro_metadata[:rights], language: 'en'}]
+
+      metadata = Array.new
+      keys = %w[dc.title dc.title.alternative dc.description dc.description.abstract dc.creator dc.subject dc.date dc.rights]
+      values = [ro_metadata[:title], ro_metadata[:alt_title], ro_metadata[:description], ro_metadata[:abstract], ro_metadata[:creator], ro_metadata[:subject], ro_metadata[:date], ro_metadata[:rights]]
+
+      keys.zip(values).each do|i, j|
+        metadata << h = {'key'=> i , 'value'=> j , 'language' => 'eng'}
+      end
 
       response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
