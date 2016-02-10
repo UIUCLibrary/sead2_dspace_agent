@@ -43,7 +43,7 @@ module Sead2DspaceAgent
       values = [ro_metadata[:title], ro_metadata[:alt_title], ro_metadata[:description], ro_metadata[:abstract], ro_metadata[:creator], ro_metadata[:subject], ro_metadata[:date], ro_metadata[:rights]]
 
       keys.zip(values).each do|i, j|
-        metadata << h = {'key'=> i , 'value'=> j , 'language' => 'eng'}
+        metadata << {'key'=> i , 'value'=> j , 'language' => 'eng'}
       end
 
       response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,

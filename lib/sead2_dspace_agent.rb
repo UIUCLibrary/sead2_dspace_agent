@@ -21,7 +21,7 @@ module Sead2DspaceAgent
 
   # Get new research objects
   researchobjects = sead_connection.get_new_researchojects
-  logger.info "Recieved #{researchobjects.length} research objects for processing"
+  logger.info "Received #{researchobjects.length} research objects for processing"
 
   # Establish DSpace connection
   dspace_connection = DspaceConnection.new
@@ -38,7 +38,7 @@ module Sead2DspaceAgent
 
     # Create the DSpace item
     begin
-      ro.dspace_id, ro.dspace_handle = dspace_connection.create_item(116)
+      ro.dspace_id, ro.dspace_handle = dspace_connection.create_item(1)
       logger.info "DSpace item #{ro.dspace_id} created at #{ro.dspace_handle}"
     rescue => e
       sead_connection.update_status('Failure', "Error creating DSpace item: #{e.message}", ro)
