@@ -22,17 +22,16 @@ module Sead2DspaceAgent
       @metadata[:rights]    = ore["Rights"]
       @metadata[:creator]   = ore["describes"]["Uploaded By"]
       @metadata[:date]      = ore["describes"]["Creation Date"]
-      # @metadata[:has_part]  = ore["describes"]["Has Part"]  # Only includes the agg resources' id
-      # @metadata[:subject]   = ore["describes"]["Keywords"]*", "
 
+      # Get all the fields that cannot be directly mapped to DC terms
       other_info                          = {}
       other_info["Funding Institution"]   = ore["describes"]["Funding Institution"]*", "
       other_info["Time Period"]           = ore["describes"]["Time Periods"]*", "
       other_info["Audience"]              = ore["describes"]["Audience"]*", "
       other_info["Project Investigators"] = ore["describes"]["Principal Investigator(s)"]*", "
-      @metadata[:description] = other_info.map{|k,v| "#{k} = #{v}"}.join('; ')
+      @metadata[:description] = other_info.map{|k,v| "#{k}: #{v}"}.join('; ')
 
-      # Creating separate hashes for each subjects for indexing
+      # Creating separate hashes for each subjects
       @sub = ore["describes"]["Keywords"]
       @collect_sub = Array.new
       @sub.each do |i|
@@ -47,7 +46,6 @@ module Sead2DspaceAgent
       keys.zip(values).each do|i, j|
         @all_metadata << {'key'=> i , 'value'=> j , 'language' => 'eng'}
       end
-
 
 
       ars                   = ore["describes"]["aggregates"]
