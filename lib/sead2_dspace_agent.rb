@@ -49,7 +49,7 @@ module Sead2DspaceAgent
 
     # Update DSpace metadata
     begin
-      dspace_connection.update_item_metadata(ro.metadata)
+      dspace_connection.update_item_metadata(ro.all_metadata)
       logger.info "Metadata updated for DSpace item #{ro.dspace_id} created at #{ro.dspace_handle}"
     rescue => e
       sead_connection.update_status('Failure', "Error updating DSpace item metadata: #{e.message}", ro)

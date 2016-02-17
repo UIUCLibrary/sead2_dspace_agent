@@ -4,7 +4,7 @@ module Sead2DspaceAgent
 
   class ResearchObject
 
-    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id, :all_metadata
+    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id, :sub, :collect_sub, :all_metadata
 
     def initialize(ore)
 
@@ -23,7 +23,7 @@ module Sead2DspaceAgent
       @metadata[:creator]   = ore["describes"]["Uploaded By"]
       @metadata[:date]      = ore["describes"]["Creation Date"]
       # @metadata[:has_part]  = ore["describes"]["Has Part"]  # Only includes the agg resources' id
-      @metadata[:subject]   = ore["describes"]["Keywords"]*", "
+      # @metadata[:subject]   = ore["describes"]["Keywords"]*", "
 
       other_info                          = {}
       other_info["Funding Institution"]   = ore["describes"]["Funding Institution"]*", "
@@ -32,9 +32,17 @@ module Sead2DspaceAgent
       other_info["Project Investigators"] = ore["describes"]["Principal Investigator(s)"]*", "
       @metadata[:description] = other_info.map{|k,v| "#{k} = #{v}"}.join('; ')
 
+      # Creating separate hashes for each subjects for indexing
+      @sub = ore["describes"]["Keywords"]
+      @collect_sub = Array.new
+      @sub.each do |i|
+        @collect_sub << {'key' => 'dc.subject', 'value' => i, 'language' => 'eng'}
+      end
+
       @all_metadata = Array.new
-      keys = %w[dc.title dc.title.alternative dc.description dc.description.abstract dc.creator dc.subject dc.date dc.rights]
-      values = [@metadata[:title], @metadata[:alt_title], @metadata[:description], @metadata[:abstract], @metadata[:creator], @metadata[:subject], @metadata[:date], @metadata[:rights]]
+      @all_metadata.concat(@collect_sub)
+      keys = %w[dc.title dc.title.alternative dc.description dc.description.abstract dc.creator dc.date dc.rights]
+      values = [@metadata[:title], @metadata[:alt_title], @metadata[:description], @metadata[:abstract], @metadata[:creator], @metadata[:date], @metadata[:rights]]
 
       keys.zip(values).each do|i, j|
         @all_metadata << {'key'=> i , 'value'=> j , 'language' => 'eng'}

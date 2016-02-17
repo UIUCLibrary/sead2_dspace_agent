@@ -38,15 +38,7 @@ module Sead2DspaceAgent
 
     def update_item_metadata(ro_metadata)
 
-      metadata = Array.new
-      keys = %w[dc.title dc.title.alternative dc.description dc.description.abstract dc.creator dc.subject dc.date dc.rights]
-      values = [ro_metadata[:title], ro_metadata[:alt_title], ro_metadata[:description], ro_metadata[:abstract], ro_metadata[:creator], ro_metadata[:subject], ro_metadata[:date], ro_metadata[:rights]]
-
-      keys.zip(values).each do|i, j|
-        metadata << {'key'=> i , 'value'=> j , 'language' => 'eng'}
-      end
-
-      response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", metadata.to_json,
+      response = RestClient.put("#{@url}/rest/items/#{@itemid}/metadata", ro_metadata.to_json,
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
