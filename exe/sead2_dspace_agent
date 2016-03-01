@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'sead2_dspace_agent'
+require 'logger'
+
+runner = Sead2DspaceAgent::Runner
+runner.run
