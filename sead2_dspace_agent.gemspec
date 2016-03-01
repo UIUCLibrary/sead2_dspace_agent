@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Bill Ingram']
   spec.email         = ['waingram@gmail.com']
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = 'Move research objects from SEAD into a DSpace repository.'
+  spec.description   = 'Move research objects from SEAD into a DSpace repository.'
+  spec.homepage      = 'https://github.com/UIUCLibrary/sead2_dspace_agent'
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
