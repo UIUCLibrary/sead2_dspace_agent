@@ -32,11 +32,17 @@ module Sead2DspaceAgent
       end
 
       # Create separate hash for each subjects and creators
-      def mult_values(keys, arrays)
-        unless arrays.nil?
-          arrays.each do |i|
+      def mult_values(keys, values)
+        if values.nil?
+          return
+        elsif values.is_a? Array
+          values.each do |i|
             @collect << {'key' => keys, 'value' => i, 'language' => 'eng'}
           end
+        elsif values.is_a? String
+          @collect << {'key' => keys, 'value' => values, 'language' => 'eng'}
+        else
+          return
         end
       end
 
