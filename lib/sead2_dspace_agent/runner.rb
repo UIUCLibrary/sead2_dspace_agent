@@ -1,6 +1,5 @@
 require 'logger'
 
-
 module Sead2DspaceAgent
   class Runner
 
