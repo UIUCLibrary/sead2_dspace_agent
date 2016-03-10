@@ -57,12 +57,31 @@ module Sead2DspaceAgent
         request = Net::HTTP::Get.new uri
 
         http.request request do |response|
-          len          = response.content_length || size
+
           content_type = response.content_type
           read_bytes   = 0
           chunk        = ''
 
           chunker = lambda do
+
+            # special handling of chunked encoding
+            if chunked? response.header['transfer-encoding']
+              line = response.socket.readline
+              hexlen = line.slice(/[0-9a-fA-F]+/) or
+                  raise Net::HTTPBadResponse, "wrong chunk size line: #{line}"
+              len = hexlen.hex
+              return '' if len == 0
+              begin
+                chunk = response.socket.read(len)
+              ensure
+                read_bytes += len
+                p "read #{read_bytes} of #{size} bytes expected"
+                response.socket.read 2 # \r\n
+              end
+              return chunk.to_s
+            end
+
+            len = response.content_length
             begin
               if read_bytes + Excon::CHUNK_SIZE < len
                 chunk      = response.socket.read(Excon::CHUNK_SIZE)
@@ -78,11 +97,9 @@ module Sead2DspaceAgent
           end
 
           Excon.ssl_verify_peer = false
-          Excon.post(target_uri.to_s, :request_block => chunker, :headers => {'rest-dspace-token' => @login_token, content_type: content_type})
+          ds_res = Excon.post(target_uri.to_s, :request_block => chunker, :headers => {'rest-dspace-token' => @login_token, content_type: content_type})
 
-          # not sure about this -- need to return to break out of the
-          # block when the content length is unknown.
-          return unless response.content_length
+          return ds_res
 
         end
       end
@@ -92,6 +109,17 @@ module Sead2DspaceAgent
       response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=ore.json", file,
                                  {content_type: :json, accept: :json, rest_dspace_token: @login_token})
 
+    end
+
+    private
+
+    # Returns "true" if the "transfer-encoding" header is present and
+    # set to "chunked".  This is an HTTP/1.1 feature, allowing the
+    # the content to be sent in "chunks" without at the outset
+    # stating the entire content length.
+    def chunked?(encoding)
+      return false unless encoding
+      (/(?:\A|[^\-\w])chunked(?![\-\w])/i =~ encoding) ? true : false
     end
 
   end
