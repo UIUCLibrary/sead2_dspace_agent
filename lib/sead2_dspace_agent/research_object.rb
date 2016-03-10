@@ -4,7 +4,7 @@ module Sead2DspaceAgent
 
   class ResearchObject
 
-    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id, :sub, :collect_sub, :all_metadata
+    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id, :all_metadata, :creator, :abstract
 
     def initialize(ore)
 

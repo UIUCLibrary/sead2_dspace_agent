@@ -1,5 +1,10 @@
 require 'rest-client'
 require 'net/http'
+require 'excon'
+
+class Net::HTTPResponse
+  attr_reader :socket
+end
 
 module Sead2DspaceAgent
 
@@ -42,37 +47,46 @@ module Sead2DspaceAgent
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
-    def update_item_bitstream(filename, url, cookies = {})
-      bitstream = Tempfile.new(filename)
-      name      = CGI.escape filename
+    def update_item_bitstream(filename, url, size, cookies = {})
 
       uri = URI(url)
       content_type = "text/plain"
+      target_uri = URI("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{CGI.escape(filename)}")
 
       begin
         Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri
-          cookies.each { |k, v|
-            request['Cookie'] = CGI::Cookie.new(k, v).to_s
-          }
 
           http.request request do |response|
-            content_type = response['content-type']
-            open bitstream, 'w' do |io|
-              response.read_body do |chunk|
-                io.write chunk
+            len = response.content_length || size
+            p "reading #{len} bytes..."
+            read_bytes = 0
+            chunk      = ''
+
+            chunker = lambda do
+              begin
+                if read_bytes + Excon::CHUNK_SIZE < len
+                  chunk      = response.socket.read(Excon::CHUNK_SIZE)
+                  read_bytes += chunk.size
+                else
+                  chunk      = response.socket.read(len - read_bytes)
+                  read_bytes += chunk.size
+                end
+              rescue EOFError
+                # ignore eof
               end
+              p "read #{read_bytes} bytes"
+              chunk
             end
+
+            Excon.ssl_verify_peer = false
+            Excon.post(target_uri.to_s, :request_block => chunker, :headers => {'rest-dspace-token' => @login_token, content_type: content_type})
+
+            p 'Done!'
+
           end
         end
-
-        response = RestClient.post("#{@url}/rest/items/#{@itemid}/bitstreams?name=#{name}", bitstream,
-                                   {content_type: content_type, accept: :json, rest_dspace_token: @login_token})
-      ensure
-        bitstream.close
-        bitstream.unlink # deletes the temp file
       end
-
     end
 
   end

@@ -59,17 +59,6 @@ module Sead2DspaceAgent
           next # give up and go to the next ro
         end
 
-        # Deposit ORE ReM as a DSpace bitstream
-        begin
-          dspace_connection.update_item_bitstream('ore.json', sead_connection.proxy_url(ro.ore_url), sead_connection.cookies)
-          @logger.info "Uploaded ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
-        rescue => e
-          sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)
-          @logger.error "Failed to upload ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
-          dspace_connection.delete_item
-          next # give up and go to the next ro
-        end
-
         # Process ARs
         @logger.info "Processing #{ro.aggregated_resources.length} aggregated resources for research object: #{ro.metadata[:id]}"
         errors = false
@@ -78,8 +67,9 @@ module Sead2DspaceAgent
 
           # Deposit AR into DSpace
           begin
-            dspace_connection.update_item_bitstream(ar.title, ar.file_url)
-            @logger.info "Uploaded #{ar.title} to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
+            @logger.info "Uplading #{ar.title} to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
+            dspace_connection.update_item_bitstream(ar.title, ar.file_url, ar.size)
+            @logger.info "Success"
           rescue => e
             sead_connection.update_status('Failure', "Error submitting #{ar.title}: #{e.message}", ro)
             @logger.error "Failed to upload #{ar.title} to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
@@ -92,6 +82,17 @@ module Sead2DspaceAgent
           @logger.error "Failed to upload one or more ARs to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}. Giving up."
           dspace_connection.delete_item
           next
+        end
+
+        # Deposit ORE ReM as a DSpace bitstream
+        begin
+          dspace_connection.update_item_bitstream('ore.json', sead_connection.proxy_url(ro.ore_url), sead_connection.cookies)
+          @logger.info "Uploaded ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
+        rescue => e
+          sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)
+          @logger.error "Failed to upload ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}: #{e.message}"
+          dspace_connection.delete_item
+          next # give up and go to the next ro
         end
 
         # Update status
