@@ -4,45 +4,24 @@ module Sead2DspaceAgent
 
   class ResearchObject
 
-    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :dspace_handle, :dspace_id, :all_metadata, :creator, :abstract
+    attr_accessor :aggregated_resources, :metadata, :status_url, :ore_url, :ore_file, :dspace_handle, :dspace_id, :all_metadata, :creator, :abstract
 
-    def initialize(ore)
+    def initialize(response)
 
       @dspace_id     = nil
       @dspace_handle = nil
 
+      @ore_file = Tempfile.new('ore.json')
+      File.write(@ore_file, response.to_s)
+
+      ore      = JSON.parse response
+
       @ore_url = ore['@id']
       @status_url = ore['@id'].gsub('oremap', 'status')
 
+
       @metadata             = {}
       @metadata[:id]        = ore["describes"]["@id"]    # Don't add this id in metadata
-
-
-      # join values of non-dc terms to post as single value for description
-      def join_values(k, a)
-        if a.nil?
-          return
-        elsif a.kind_of?(Array) && !a.nil?
-          @other_info[k] = a*", "
-        elsif a.kind_of?(String) && !a.nil?
-          @other_info[k] = a
-        end
-      end
-
-      # Create separate hash for each dc terms
-      def mult_values(keys, values)
-        if values.nil?
-          return
-        elsif values.is_a? Array
-          values.each do |i|
-            @all_metadata << {'key' => keys, 'value' => i, 'language' => 'eng'}
-          end
-        elsif values.is_a? String
-          @all_metadata << {'key' => keys, 'value' => values, 'language' => 'eng'}
-        else
-          return
-        end
-      end
 
 
       # Get all the fields that cannot be directly mapped to DC terms
@@ -95,7 +74,38 @@ module Sead2DspaceAgent
       @aggregated_resources = ars.map { |ar| AggregatedResource.new ar }
     end
 
+    # join values of non-dc terms to post as single value for description
+    def join_values(k, a)
+      if a.nil?
+        return
+      elsif a.kind_of?(Array) && !a.nil?
+        @other_info[k] = a*", "
+      elsif a.kind_of?(String) && !a.nil?
+        @other_info[k] = a
+      end
+    end
+
+    # Create separate hash for each dc terms
+    def mult_values(keys, values)
+      if values.nil?
+        return
+      elsif values.is_a? Array
+        values.each do |i|
+          @all_metadata << {'key' => keys, 'value' => i, 'language' => 'eng'}
+        end
+      elsif values.is_a? String
+        @all_metadata << {'key' => keys, 'value' => values, 'language' => 'eng'}
+      else
+        return
+      end
+    end
+
+    def self.finalize(ore_file)
+      proc {
+        ore_file.close
+        ore_file.unlink # deletes the temp file
+      }
+    end
+
   end
-
-
 end

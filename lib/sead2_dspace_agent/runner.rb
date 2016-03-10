@@ -76,8 +76,8 @@ module Sead2DspaceAgent
             errors = true
             next # give up and go to the next ro
           end
-
         end
+
         if errors
           @logger.error "Failed to upload one or more ARs to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}. Giving up."
           dspace_connection.delete_item
@@ -86,7 +86,7 @@ module Sead2DspaceAgent
 
         # Deposit ORE ReM as a DSpace bitstream
         begin
-          dspace_connection.update_item_bitstream('ore.json', ro.ore_url)
+          dspace_connection.update_ore_bitstream(ro.ore_file)
           @logger.info "Uploaded ore.json to DSpace item #{ro.dspace_id} at #{ro.dspace_handle}"
         rescue => e
           sead_connection.update_status('Failure', "Error submitting ore.json: #{e.message}", ro)

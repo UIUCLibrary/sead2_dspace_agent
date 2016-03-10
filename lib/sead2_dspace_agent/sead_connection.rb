@@ -26,8 +26,7 @@ module Sead2DspaceAgent
         attrs    = JSON.parse ro
         ore_url  = attrs['Aggregation']['@id']
         response = RestClient.get(ore_url)
-        ore      = JSON.parse response
-        ResearchObject.new ore
+        ResearchObject.new response
       }
 
     end
