@@ -47,7 +47,7 @@ module Sead2DspaceAgent
                                 {content_type: :json, accept: :json, rest_dspace_token: @login_token})
     end
 
-    def update_item_bitstream(filename, url, size, cookies = {})
+    def update_item_bitstream(filename, url, size)
 
       uri = URI(url)
       content_type = "text/plain"

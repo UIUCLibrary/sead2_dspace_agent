@@ -9,7 +9,3 @@ dspace:
 sead:
   c3pr_base_url: https://seadva-test.d2i.indiana.edu/sead-c3pr/api
   repository_id: ideals
-  use_proxy: true
-  proxy_base_url: https://sead-test.ncsa.illinois.edu/c3pr/proxy/sead-c3pr/api
-  proxy_cookies:
-    JSESSIONID: 
